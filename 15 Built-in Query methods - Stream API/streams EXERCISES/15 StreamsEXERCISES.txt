@@ -1,0 +1,449 @@
+Problem 1.	Students by Group
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class _1_StudentsbyGroup {
+
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+        List<String[]> names=new ArrayList<String[]>();
+
+        String input=scanner.nextLine();
+
+        while ("END".equals(input)==false){
+            String[] curr=input.split("\\s+");
+            names.add(curr);
+
+            input=scanner.nextLine();
+        }
+
+        names.stream()
+                .filter(x->"2".equals(x[x.length-1]))
+                .sorted((x,y)->x[0].compareTo(y[0]))
+                .forEach(x->{
+                    System.out.println(x[0]+" "+x[1]);
+                });
+    }
+}
+
+Problem 2.	Students by First and Last Name
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class _2_StudentsbyFirstandLastName {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<String[]> names=new ArrayList<String[]>();
+
+        String input=scanner.nextLine();
+
+        while ("END".equals(input)==false){
+            String[] curr=input.split("\\s+");
+            names.add(curr);
+
+            input=scanner.nextLine();
+        }
+
+        names.stream()
+                .filter(x-> x[0].compareTo(x[1])<0)
+                .forEach(name->{
+                    System.out.println(name[0]+" "+name[1]);
+                });
+    }
+}
+
+Problem 3.	Students by Age
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class _3_StudentsbyAge {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        List<String[]> names=new ArrayList<String[]>();
+
+        String input=scanner.nextLine();
+
+        while ("END".equals(input)==false){
+            String[] curr=input.split("\\s+");
+            names.add(curr);
+
+            input=scanner.nextLine();
+        }
+
+        names.stream()
+                .filter(x->Integer.parseInt(x[2])>=18&&Integer.parseInt(x[2])<=24)
+                .forEach(n-> System.out.println(String.join(" ",n)));
+    }
+}
+
+
+Problem 4.	Sort Students
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class _4_SortStudents {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<String[]> names=new ArrayList<String[]>();
+
+        String input=scanner.nextLine();
+
+        while ("END".equals(input)==false){
+            String[] curr=input.split("\\s+");
+            names.add(curr);
+
+            input=scanner.nextLine();
+        }
+
+        names.stream()
+                .sorted((x,y)->{
+                    int sort=x[1].compareTo(y[1]);
+                    if(sort==0){
+                        return y[0].compareTo(x[0]);
+                    }
+                    return sort;
+                })
+                .forEach(x-> System.out.println(x[0]+" "+x[1]));
+    }
+}
+
+Problem 5.	Filter Students by Email Domain
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class _5_FilterStudentsbyEmailDomain {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<String[]> names=new ArrayList<String[]>();
+
+        String input=scanner.nextLine();
+
+        while ("END".equals(input)==false){
+            String[] curr=input.split("\\s+");
+            names.add(curr);
+
+            input=scanner.nextLine();
+        }
+
+        names.stream()
+                .filter(x->x[2].endsWith("@gmail.com"))
+                .forEach(s-> System.out.println(s[0]+" "+s[1]));
+
+    }
+}
+
+Problem 6.	Filter Students by Phone
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class _6_FilterStudentsbyPhone {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<String[]> names=new ArrayList<String[]>();
+
+        String input=scanner.nextLine();
+
+        while ("END".equals(input)==false){
+            String[] curr=input.split("\\s+");
+            names.add(curr);
+
+            input=scanner.nextLine();
+        }
+
+        names.stream()
+                .filter(x->x[2].startsWith("02")||x[2].startsWith("+3592"))
+                .forEach(s-> System.out.println(s[0]+" "+s[1]));
+    }
+}
+
+Problem 7.	Excellent Students
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+public class _7_ExcellentStudents {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        LinkedHashMap<String,List<Integer>> students=new LinkedHashMap<>();
+
+        while (true){
+            String firstName=scanner.next();
+            if("END".endsWith(firstName)){
+                break;
+            }
+            String name=firstName+" "+scanner.next();
+
+            List<Integer>notes=Arrays.stream(scanner.nextLine().split("\\s+"))
+                    .filter(x->x.equals("")==false)
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+
+            students.put(name,notes);
+        }
+
+        students.entrySet().stream()
+                .filter(kv->kv.getValue().contains(6))
+                .forEach(kv-> System.out.println(kv.getKey()));
+    }
+}
+
+Problem 8.	Weak Students
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+public class _8_WeakStudents {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        LinkedHashMap<String,List<Integer>> students=new LinkedHashMap<>();
+
+        while (true){
+            String firstName=scanner.next();
+            if("END".endsWith(firstName)){
+                break;
+            }
+            String name=firstName+" "+scanner.next();
+
+            List<Integer>notes=Arrays.stream(scanner.nextLine().split("\\s+"))
+                    .filter(x->x.equals("")==false)
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+
+            students.put(name,notes);
+        }
+
+        students.entrySet().stream()
+                .filter(kv->{
+                    int count=0;
+                    for (int s : kv.getValue()) {
+                        if(s<=3){
+                            count++;
+                        }
+                    }
+                    return count>=2;
+                })
+                .forEach(kv-> System.out.println(kv.getKey()));
+    }
+}
+
+Problem 9.	Students Enrolled in 2014 or 2015
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+public class _9_StudentsEnrolledin2014or2015 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        LinkedHashMap<String,String> students=new LinkedHashMap<>();
+
+        while (true){
+            String firstName=scanner.next();
+            if("END".endsWith(firstName)){
+                break;
+            }
+            students.put(firstName,scanner.nextLine().trim());
+        }
+
+        students.keySet().stream()
+                .filter(key->key.endsWith("14")||key.endsWith("15"))
+                .forEach(key-> System.out.println(students.get(key)));
+
+    }
+}
+
+
+Problem 10.	* Group by Group
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+public class _9_StudentsEnrolledin2014or2015 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        LinkedHashMap<String,String> students=new LinkedHashMap<>();
+
+        while (true){
+            String firstName=scanner.next();
+            if("END".endsWith(firstName)){
+                break;
+            }
+            students.put(firstName,scanner.nextLine().trim());
+        }
+
+        students.keySet().stream()
+                .filter(key->key.endsWith("14")||key.endsWith("15"))
+                .forEach(key-> System.out.println(students.get(key)));
+
+    }
+}
+
+Problem 11.	* Students Joined to Specialties
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+public class _9_StudentsEnrolledin2014or2015 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        LinkedHashMap<String,String> students=new LinkedHashMap<>();
+
+        while (true){
+            String firstName=scanner.next();
+            if("END".endsWith(firstName)){
+                break;
+            }
+            students.put(firstName,scanner.nextLine().trim());
+        }
+
+        students.keySet().stream()
+                .filter(key->key.endsWith("14")||key.endsWith("15"))
+                .forEach(key-> System.out.println(students.get(key)));
+
+    }
+}
+
+Problem 12.	* Little John
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class _12_star_LittleJohn {
+    public static void main(String[] args) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+
+        String patBigArrow="(>>>----->>)|(>>----->)|(>----->)";
+
+        Pattern bigPat=Pattern.compile(patBigArrow);
+
+
+        int bigCount=0;
+        int medCount=0;
+        int smallCount=0;
+
+        for(int i=0; i<4; i++){
+            StringBuilder input=new StringBuilder(reader.readLine());
+            Matcher big=bigPat.matcher(input);
+            while (big.find()){
+
+                if(big.group(1)!=null){
+                    bigCount++;
+                }
+                if(big.group(2)!=null){
+                    medCount++;
+                }
+                if (big.group(3)!=null){
+                    smallCount++;
+                }
+            }
+
+        }
+        String resNum=""+smallCount+medCount+bigCount;
+        String orig=Long.toBinaryString(Long.parseLong(resNum));
+        StringBuilder torev=new StringBuilder(orig);
+        torev.reverse();
+        String origRev=torev.toString();
+
+        String fin=orig+origRev;
+
+        StringBuilder bin=new StringBuilder(Integer.toBinaryString(Integer.parseInt(resNum)));
+        StringBuilder res=new StringBuilder(bin);
+
+        res.append(bin.reverse());
+
+        int number=Integer.parseInt(fin,2);
+        System.out.println(number);
+    }
+}
+
+Problem 13.	 * Office Stuff
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+public class _13_star_OfficeStuff {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        String regex="\\|(.+)\\s+-\\s+(\\d+)\\s+-\\s+(.+)\\|";
+        Pattern pat=Pattern.compile(regex);
+
+        LinkedHashMap<String,LinkedHashMap<String,Integer>> companies=new LinkedHashMap<>();
+
+
+        int n=Integer.parseInt(scanner.nextLine());
+
+        for(int i=0; i<n; i++){
+            Matcher match=pat.matcher(scanner.nextLine());
+
+            if(match.find()){
+                String company=match.group(1);
+                String product=match.group(3);
+                int count=Integer.parseInt(match.group(2));
+
+                if(companies.containsKey(company)==false){
+                    LinkedHashMap<String,Integer> curProd=new LinkedHashMap<>();
+                    curProd.put(product,count);
+                    companies.put(company,curProd);
+                }else{
+                    if(companies.get(company).containsKey(product)==false){
+                        companies.get(company).put(product,count);
+                    }else {
+                        companies.get(company).put(product,companies.get(company).get(product)+  count);
+                    }
+                }
+            }
+        }
+
+        companies.entrySet().stream()
+                .sorted((x,y)->x.getKey().compareTo(y.getKey()))
+                .forEach(kv->{
+                    System.out.print(kv.getKey()+": ");
+                    List<String> curr=kv.getValue().entrySet().stream()
+                            .map(x->{
+                                return x.getKey()+"-"+x.getValue();
+                            })
+                            .collect(Collectors.toList());
+                    System.out.println(String.join(", ",curr));
+                });
+
+    }
+}
