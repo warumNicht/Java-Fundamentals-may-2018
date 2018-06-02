@@ -1,0 +1,415 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class _1_HandScore {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+
+        String[] cards=reader.readLine().split("\\s+");
+        int curCount=1;
+        int curStart=0;
+        int curSum=0;
+        int sum=0;
+        for (int i = 0; i <cards.length-1 ; i++) {
+
+            if(cards[i].charAt(cards[i].length()-1)==cards[i+1].charAt(cards[i+1].length()-1)){
+                if(curCount==1){
+                    curStart=i;
+                }
+                curCount++;
+            }else {
+                if(curCount>1){
+
+                    for (int j = curStart; j <curStart+curCount ; j++) {
+                        curSum+=calculateSum(cards[j]);
+                    }
+                    curSum*=curCount;
+                    sum+=curSum;
+
+                    curCount=1;
+                    curSum=0;
+                }else {
+                    sum+=calculateSum(cards[i]);
+                }
+            }
+        }
+
+        if(curCount>1){
+            for (int j = curStart; j <curStart+curCount ; j++) {
+                curSum+=calculateSum(cards[j]);
+            }
+            curSum*=curCount;
+            sum+=curSum;
+        }else {
+            sum+=calculateSum(cards[cards.length-1]);
+        }
+        System.out.println(sum);
+
+
+    }
+
+    private static int calculateSum(String card) {
+
+        int res=0;
+
+        if(card.length()==3){
+            res=10;
+        }else {
+            switch (card.charAt(0)){
+                case '2':
+                    res=2;
+                    break;
+                case '3':
+                    res=3;
+                    break;
+                case '4':
+                    res=4;
+                    break;
+                case '5':
+                    res=5;
+                    break;
+                case '6':
+                    res=6;
+                    break;
+                case '7':
+                    res=7;
+                    break;
+                case '8':
+                    res=8;
+                    break;
+                case '9':
+                    res=9;
+                    break;
+                case 'J':
+                    res=12;
+                    break;
+                case 'Q':
+                    res=13;
+                    break;
+                case 'K':
+                    res=14;
+                    break;
+                case 'A':
+                    res=15;
+                    break;
+            }
+        }
+        return res;
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+
+public class _2_SimpleExpression {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        StringBuilder text=new StringBuilder(reader.readLine());
+
+        String regex="\\d+";
+
+
+        Pattern pat=Pattern.compile(regex);
+
+        BigDecimal sumRes=new BigDecimal(0);
+
+        Matcher match=pat.matcher(text);
+        int endIndexlast=0;
+        BigDecimal lastNum=new BigDecimal(0);
+        if(match.find()){
+
+            endIndexlast=match.end();
+            lastNum=new BigDecimal(match.group().replaceAll("\\s+",""));
+
+            sumRes=sumRes.add(lastNum);
+        }
+
+        while (match.find()){
+
+            int startNew=match.start();
+            BigDecimal newNum=new BigDecimal(match.group().replaceAll("\\s+",""));
+
+            String medium=text.substring(endIndexlast,startNew).toString();
+            if(medium.length()%2==0){
+                sumRes=sumRes.add(newNum);
+            }else {
+                sumRes=sumRes.subtract(newNum);
+            }
+
+            lastNum=newNum;
+            endIndexlast=match.end();
+
+        }
+
+        BigDecimal scaled = sumRes.round(new MathContext(7, RoundingMode.HALF_UP));
+        DecimalFormat form=new DecimalFormat("#.#######");
+        String formatted= form.format(scaled);
+        System.out.println(scaled);
+
+
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class _3_ChessKnight_100ot100 {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        char[][] deque=new char[8][8];
+
+        for(int i=0; i<8; i++){
+            String row=reader.readLine();
+            row=row.replaceAll("\\|","");
+
+            deque[i]=row.toCharArray();
+        }
+        List<Character> vzeti=new ArrayList<>();
+        int invalidMoves=0;
+        int outMoves=0;
+
+        String com=reader.readLine();
+
+        int lastRow=com.charAt(0)-48;
+        int lastCol=com.charAt(1)-48;
+
+        int curRow=0;
+        int curCol=0;
+        com=reader.readLine();
+
+        while ("END".equals(com)==false){
+            String[] tokens=com.split("\\s+->\\s+");
+
+            curRow=tokens[1].charAt(0)-48;
+            curCol=tokens[1].charAt(1)-48;
+            if(canMove(deque,lastRow,lastCol,curRow,curCol)){
+
+                if(isValidPos(tokens[1])){
+                    if(deque[curRow][curCol]!=' '){
+                        vzeti.add(deque[curRow][curCol]);
+                        deque[curRow][curCol]=' ';
+                    }
+                    lastRow=curRow;
+                    lastCol=curCol;
+                }else {
+                    outMoves++;
+                }
+            }else {
+                invalidMoves++;
+            }
+            com=reader.readLine();
+        }
+        System.out.printf("Pieces take: %s%n",vzeti.toString().replaceAll("\\[|]",""));
+        System.out.printf("Invalid moves: %d%n",invalidMoves);
+        System.out.printf("Board out moves: %d",outMoves);
+    }
+
+    private static boolean canMove(char[][] deque, int lastRow, int lastCol, int curRow, int curCol) {
+
+        if((Math.abs(curRow-lastRow)==2&&Math.abs(curCol-lastCol)==1) ||
+                (Math.abs(curRow-lastRow)==1&&Math.abs(curCol-lastCol)==2)){
+            return  true;
+        }
+        return false;
+    }
+
+    private static boolean isValidPos(String token) {
+        if(token.length()!=2){
+            return  false;
+        }else {
+            if(token.charAt(0)>'7'||token.charAt(0)<'0'||
+                    token.charAt(1)>'7'||token.charAt(1)<'0'){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class _3_ChessKnight_50ot100 {
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        char[][] deque=new char[8][8];
+
+        for(int i=0; i<8; i++){
+            String row=reader.readLine();
+            row=row.replaceAll("\\|","");
+
+            deque[i]=row.toCharArray();
+        }
+
+        List<Character> vzeti=new ArrayList<>();
+        int invalidMoves=0;
+        int outMoves=0;
+
+        String com=reader.readLine();
+
+        int lastRow=com.charAt(0)-48;
+        int lastCol=com.charAt(1)-48;
+
+        int curRow=0;
+        int curCol=0;
+        com=reader.readLine();
+
+        while ("END".equals(com)==false){
+            String[] tokens=com.split("\\s+->\\s+");
+
+            curRow=tokens[1].charAt(0)-48;
+            curCol=tokens[1].charAt(1)-48;
+            if(canMove(deque,lastRow,lastCol,curRow,curCol)){
+
+                if(isValidPos(tokens[1])){
+                    if(deque[curRow][curCol]!=' '){
+                        vzeti.add(deque[curRow][curCol]);
+                        deque[curRow][curCol]=' ';
+                    }
+                    lastRow=curRow;
+                    lastCol=curCol;
+
+                }else {
+                    outMoves++;
+                }
+
+            }else {
+                invalidMoves++;
+            }
+            com=reader.readLine();
+        }
+
+
+        System.out.print("Pieces take: ");
+        int resCount=vzeti.size();
+        if(vzeti.isEmpty()==false)
+            for (int i = 0; i <resCount ; i++) {
+                if(i==resCount-1){
+                    System.out.println(vzeti.get(i));
+                }else {
+                    System.out.print(vzeti.get(i)+", ");
+                }
+            }
+        System.out.printf("Invalid moves: %d%n",invalidMoves);
+        System.out.printf("Board out moves: %d",outMoves);
+
+    }
+
+    private static boolean canMove(char[][] deque, int lastRow, int lastCol, int curRow, int curCol) {
+
+        if((Math.abs(curRow-lastRow)==2&&Math.abs(curCol-lastCol)==1) ||
+                (Math.abs(curRow-lastRow)==1&&Math.abs(curCol-lastCol)==2)){
+            return  true;
+        }
+        return false;
+    }
+
+    private static boolean isValidPos(String token) {
+        if(token.length()!=2){
+            return  false;
+        }else {
+            if(token.charAt(0)>'7'||token.charAt(0)<'0'||
+                    token.charAt(1)>'7'||token.charAt(1)<'0'){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.TreeMap;
+
+public class _4_FootballStats {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String regex="\\s+-\\s+|\\s+result\\s+";
+
+        String input=reader.readLine();
+
+        LinkedHashMap<String,TreeMap<String,List<String>>> teams=new LinkedHashMap<>();
+
+        while ("Season End".equals(input)==false){
+
+            String[] tockens=input.split(regex);
+            String firstTeam=tockens[0];
+            String secTeam=tockens[1];
+            String result=tockens[2];
+
+            if(teams.containsKey(firstTeam)==false){
+                List<String> curr=new ArrayList<>();
+                curr.add(result);
+                TreeMap<String,List<String>> currMap=new TreeMap<>();
+                currMap.put(secTeam,curr);
+                teams.put(firstTeam,currMap);
+            }else {
+                if(teams.get(firstTeam).containsKey(secTeam)==false){
+                    teams.get(firstTeam).put(secTeam,new ArrayList<>());
+                }
+                teams.get(firstTeam).get(secTeam).add(result);
+            }
+
+            StringBuilder toReverse=new StringBuilder(result);
+            toReverse.reverse();
+
+            if(teams.containsKey(secTeam)==false){
+                List<String> currList=new ArrayList<>();
+                currList.add(toReverse.toString());
+                TreeMap<String,List<String>> currMap=new TreeMap<>();
+                currMap.put(firstTeam,currList);
+                teams.put(secTeam,currMap);
+            }else {
+                if(teams.get(secTeam).containsKey(firstTeam)==false){
+                    teams.get(secTeam).put(firstTeam,new ArrayList<>());
+                }
+                teams.get(secTeam).get(firstTeam).add(toReverse.toString());
+            }
+            input=reader.readLine();
+        }
+        String[] listToPrint=reader.readLine().split(",\\s+");
+
+        for (String s : listToPrint) {
+
+            if(teams.containsKey(s)){
+                teams.get(s).entrySet().stream()
+                        .forEach(kv->{
+                            kv.getValue().stream()
+                                    .forEach(x->{
+                                        System.out.printf("%s - %s -> %s%n",s,kv.getKey(),x);
+                                    });
+
+                        });
+            }
+
+        }
+    }
+}
