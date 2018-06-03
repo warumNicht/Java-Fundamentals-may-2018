@@ -1,0 +1,238 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class _1_SecondNature {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        ArrayDeque<Integer> edelWeisse=new ArrayDeque<>();
+        Stack<Integer> buckets=new Stack<>();
+
+        String[] flowtok=reader.readLine().split("\\s+");
+        for (String s : flowtok) {
+            edelWeisse.offer(Integer.parseInt(s));
+        }
+        String[] kofitok=reader.readLine().split("\\s+");
+
+        for (String s : kofitok) {
+            buckets.push(Integer.parseInt(s));
+        }
+
+        List<Integer> immerBluehende=new ArrayList<>();
+
+        while (edelWeisse.isEmpty()==false&&buckets.isEmpty()==false){
+
+            int currBucket=buckets.pop();
+            int curFlower=edelWeisse.poll();
+
+            if(curFlower==currBucket){
+                immerBluehende.add(curFlower);
+            }else if(curFlower>currBucket){
+
+                curFlower-=currBucket;
+                edelWeisse.addFirst(curFlower);
+            }else {
+                int toremove=currBucket-curFlower;
+                if(buckets.isEmpty()==false){
+                    buckets.push(buckets.pop()+toremove);
+                }else {
+                    buckets.push(toremove);
+                }
+            }
+        }
+
+        if(edelWeisse.isEmpty()){
+            while (buckets.isEmpty()==false){
+                System.out.print(buckets.pop()+" ");
+            }
+            System.out.println();
+        }else {
+            while (edelWeisse.isEmpty()==false){
+                System.out.print(edelWeisse.poll()+" ");
+            }
+            System.out.println();
+        }
+
+        if(immerBluehende.isEmpty()){
+            System.out.println("None");
+        }else {
+            for (Integer n : immerBluehende) {
+                System.out.print(n+" ");
+            }
+        }
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class _2_NaturesProphet {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] boundaries=reader.readLine().split("\\s+");
+        int n=Integer.parseInt(boundaries[0]);
+        int m=Integer.parseInt(boundaries[1]);
+
+        short[][] garden=new short [n][m];
+
+        String input=reader.readLine();
+
+        while ("Bloom Bloom Plow".equals(input)==false){
+            String[] tokens=input.split("\\s+");
+            short row=Short.parseShort(tokens[0]);
+            short col=Short.parseShort(tokens[1]);
+
+            for (int i = 0; i <m ; i++) {
+                garden[row][i]+=1;
+            }
+            for (int j = 0; j <n ; j++) {
+                garden[j][col]+=1;
+            }
+            garden[row][col]-=1;
+
+            input=reader.readLine();
+        }
+        StringBuilder res=new StringBuilder();
+        for(int i=0; i<n; i++){
+            for (int j = 0; j <m ; j++) {
+                res.append(garden[i][j]+" ");
+
+            }
+            res.append("\n");
+        }
+        System.out.println(res);
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class _3_NMS {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        StringBuilder text=new StringBuilder();
+        List<String> words=new ArrayList<>();
+
+        String input=reader.readLine();
+
+        while ("---NMS SEND---".equals(input)==false){
+            text.append(input);
+
+            input=reader.readLine();
+        }
+        int count=1;
+        if(text.length()==1){
+            System.out.println(text.charAt(0));
+        }
+
+        for(int i=1; i<text.length(); i++){
+            char a=Character.toLowerCase(text.charAt(i-1));
+            char b= Character.toLowerCase(text.charAt(i));
+            if(a<=b){
+                count++;
+                if(i==text.length()-1){
+                    String currWord=text.substring(i-count+1,i+1);
+                    words.add(currWord);
+                }
+            }else {
+                String currWord=text.substring(i-count,i);
+                words.add(currWord);
+                if(i==text.length()-1){
+                    String lastChar=text.substring(text.length()-1,text.length());
+                    words.add(lastChar);
+                }
+                count=1;
+            }
+        }
+
+        String delimiter=reader.readLine();
+
+        System.out.println(String.join(delimiter,words));
+
+
+
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class _4_AshesofRoses {
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String regex="^Grow <([A-Z][a-z]+)> <([A-Za-z0-9]+)> (\\d+)$";
+        Pattern pattern=Pattern.compile(regex);
+
+        String input=reader.readLine();
+
+        LinkedHashMap<String,LinkedHashMap<String,Long>> regions=new LinkedHashMap<>();
+
+
+        while ("Icarus, Ignite!".equals(input)==false){
+            Matcher mat=pattern.matcher(input);
+            if(mat.find()){
+                String curRegion=mat.group(1);
+                String curCol=mat.group(2);
+                Long curAmoutRoses=Long.parseLong(mat.group(3));
+
+
+                if(regions.containsKey(curRegion)==false){
+                    regions.put(curRegion,new LinkedHashMap<>());
+                    regions.get(curRegion).put(curCol,curAmoutRoses);
+                }else {
+                    if(regions.get(curRegion).containsKey(curCol)==false){
+                        regions.get(curRegion).put(curCol,curAmoutRoses);
+                    }else {
+                        long existingRoses=regions.get(curRegion).get(curCol);
+                        regions.get(curRegion).put(curCol,existingRoses+curAmoutRoses);
+                    }
+                }
+            }
+            input=reader.readLine();
+        }
+
+        regions.entrySet().stream()
+                .sorted((x,y)->{
+                    long xRoses=x.getValue().values().stream()
+                            .mapToLong(Long::longValue)
+                            .sum();
+                    long yRoses=y.getValue().values().stream()
+                            .mapToLong(Long::longValue)
+                            .sum();
+                    int res=Long.compare(yRoses,xRoses);
+                    if(res==0){
+                        return x.getKey().compareTo(y.getKey());
+                    }
+                    return res;
+                })
+                .forEach(kv->{
+                    System.out.println(kv.getKey());
+                    kv.getValue().entrySet().stream()
+                            .sorted((a,b)->{
+                                int sort=Long.compare(a.getValue(),b.getValue());
+                                if(sort==0){
+                                    return a.getKey().compareTo(b.getKey());
+                                }
+                                return sort;
+                            })
+                            .forEach(x->{
+                                System.out.printf("*--%s | %d%n", x.getKey(),x.getValue());
+                            });
+                });
+
+
+    }
+}

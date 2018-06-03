@@ -1,0 +1,214 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class _1_BitSnow {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        int[] nums=Arrays.stream(reader.readLine().split(",\\s+"))
+                .mapToInt(Integer::parseInt).toArray();
+
+        for(int i=0; i<31; i++){
+
+            int onesCount=0;
+            for (int k = 0; k <nums.length ; k++) {
+
+                int first=nums[k];
+                int firstBit=first>>i&1;
+                if(firstBit==1){
+                    onesCount++;
+                }
+            }
+            for (int d = 0; d <nums.length-onesCount ; d++) {
+                int sec=nums[d];
+                int secBit=sec>>i&1;
+                if(secBit==1){
+                    nums[d]=nums[d]^(1<<i);
+                }
+            }
+            for (int f = nums.length-onesCount; f <nums.length ; f++) {
+
+                int th=nums[f];
+                int thBit=th>>i&1;
+                if(thBit==0){
+                    nums[f]=nums[f]|(1<<i);
+                }
+            }
+        }
+        List<String> result=new ArrayList<>();
+        for (int num : nums) {
+            result.add(""+num);
+        }
+        System.out.println(String.join(", ",result));
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class _2_LittleAlchemy {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        List<Integer> number=Arrays
+                .stream(reader.readLine().split("\\s+"))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+
+        ArrayDeque<Integer> stones=new ArrayDeque<>(number);
+        ArrayDeque<Integer> gold=new ArrayDeque<>();
+
+        while (true){
+            String input=reader.readLine();
+            if("Revision".equals(input)){
+                break;
+            }
+
+            String[] tokens=input.split("\\s+");
+
+            if("acid".equals(tokens[1])){
+
+                if(stones.isEmpty()==false){
+                    int doses=Integer.parseInt(tokens[2]);
+                    while (stones.isEmpty()==false&&doses>0){
+
+                        int curStone=stones.poll();
+                        if(curStone==1){
+                            gold.push(curStone);
+                        }else {
+                            stones.offer(curStone-1);
+                        }
+                        doses--;
+                    }
+                }
+            }else{
+                if(gold.isEmpty()==false){
+                    gold.pop();
+                    int returned=Integer.parseInt(tokens[2]);
+                    stones.offer(returned);
+                }
+            }
+        }
+        while (stones.isEmpty()==false){
+            System.out.print(stones.poll()+" ");
+        }
+        System.out.println();
+        System.out.println(gold.size());
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class _3_V_logger {
+    public static final int A = 0;
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        LinkedHashMap<String,TreeSet<String>> vlogers=new LinkedHashMap<>();
+        LinkedHashMap<String,TreeSet<String>> folgende=new LinkedHashMap<>();
+
+        while (true){
+            String input=reader.readLine();
+            if("Statistics".equals(input)){
+                break;
+            }
+            String[] tokens=input.split("\\s+");
+            String firstName=tokens[0];
+
+            if(tokens[1].equals("joined")){
+                vlogers.putIfAbsent(firstName,new TreeSet<>());
+                folgende.putIfAbsent(firstName,new TreeSet<>());
+            }else{
+                String secName=tokens[2];
+                if(vlogers.containsKey(firstName)&&vlogers.containsKey(secName)){
+
+                    if(firstName.equals(secName)==false){
+
+                            vlogers.get(secName).add(firstName);
+                            folgende.get(firstName).add(secName);
+                    }
+                }
+            }
+        }
+        System.out.printf("The V-Logger has a total of %d vloggers in its logs.%n",vlogers.size());
+
+        int count=0;
+        List<Map.Entry>fin =vlogers.entrySet().stream()
+                .sorted((x,y)->{
+                    int xFow=vlogers.get(x.getKey()).size();
+                    int yFow=vlogers.get(y.getKey()).size();
+
+                    int res=Integer.compare(yFow,xFow);
+                    if(res==0){
+                        int xIsFolgend=folgende.get(x.getKey()).size();
+                        int yIsFolgend=folgende.get(y.getKey()).size();
+
+                        return Integer.compare(xIsFolgend,yIsFolgend);
+                    }
+                    return res;
+                })
+                .collect(Collectors.toList());
+
+        for (Map.Entry entry : fin) {
+            count++;
+            System.out.printf("%d. %s : %d followers, %d following%n",count,entry.getKey(),vlogers.get(entry.getKey()).size(),
+                    folgende.get(entry.getKey()).size());
+            if(count==1){
+                for (String s : vlogers.get(entry.getKey())) {
+                    System.out.printf("*  %s%n",s);
+                }
+            }
+        }
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class _4_RegularExtentions {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String input=reader.readLine();
+        StringBuffer text=new StringBuffer(input);
+        input=reader.readLine();
+
+        while (!"Print".equals(input)){
+            if(input.length()>text.length()){
+                input=reader.readLine();
+                continue;
+            }
+            input=input.replaceAll("%+","%");
+            String[] inputs = input.split("%",-1);
+            for (int i = 0; i < inputs.length; i++) {
+                inputs[i] = Pattern.quote(inputs[i]);
+            }
+            Pattern pattern = Pattern.compile(String.join("\\S*", inputs));
+
+            Matcher match=pattern.matcher(text);
+            while (match.find()) {
+
+                text.replace(match.start(), match.end(),
+                        new StringBuffer(text.substring(match.start(), match.end())).reverse().toString());
+            }
+            input = reader.readLine();
+        }
+        System.out.println(text);
+    }
+}
