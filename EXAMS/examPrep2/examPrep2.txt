@@ -1,0 +1,104 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class _4_GUnit {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String regex="^([A-Z][A-Za-z0-9]+)( \\| )([A-Z][A-Za-z0-9]+)( \\| )([A-Z][A-Za-z0-9]+)$";
+        Pattern pat=Pattern.compile(regex);
+
+        LinkedHashMap<String,LinkedHashMap<String,LinkedHashSet>> classes=new LinkedHashMap<>();
+
+        String input=reader.readLine();
+
+        while ("It's testing time!".equals(input)==false){
+
+            Matcher mat=pat.matcher(input);
+
+            if(mat.find()){
+
+                String curClass=mat.group(1);
+                String curMetod=mat.group(3);
+                String curTest=mat.group(5);
+
+                if(classes.containsKey(curClass)==false){
+                    classes.put(curClass,new LinkedHashMap<>());
+                }
+                if(classes.get(curClass).containsKey(curMetod)==false){
+                    classes.get(curClass).put(curMetod, new LinkedHashSet());
+                }
+                classes.get(curClass).get(curMetod).add(curTest);
+
+            }
+            input=reader.readLine();
+        }
+
+       classes.entrySet().stream()
+               .sorted((x,y)->{
+
+                   int xDet= x.getValue().entrySet()
+                           .stream()
+                           .mapToInt(s-> s.getValue().size())
+                           .sum();
+                   int yDet= y.getValue().entrySet()
+                           .stream()
+                           .mapToInt(s-> s.getValue().size())
+                           .sum();
+
+                   int resFirstComp=Integer.compare(yDet,xDet);
+                   if(resFirstComp==0){
+
+                       int xNumMet=x.getValue().entrySet().size();
+                       int yNumMet=y.getValue().entrySet().size();
+
+                       int secComp=Integer.compare(xNumMet,yNumMet);
+
+                       if(secComp==0){
+                            return x.getKey().compareTo(y.getKey());
+                       }
+                       return Integer.compare(xNumMet,yNumMet);
+
+                   }
+                   return   Integer.compare(yDet,xDet);
+               })
+               .forEach(kv->{
+                   System.out.println(kv.getKey()+":");
+
+                   kv.getValue().entrySet().stream()
+                           .sorted((c,d)->{
+                               int cDet=c.getValue().size();
+                               int dDet=d.getValue().size();
+                               int detComp=Integer.compare(dDet,cDet);
+                               if(detComp==0){
+                                   return c.getKey().compareTo(d.getKey());
+                               }
+                               return Integer.compare(dDet,cDet);
+                           })
+                           .forEach(dv->{
+                               System.out.printf("##%s%n",dv.getKey());
+
+                               dv.getValue().stream()
+                                       .sorted((o,p)->{
+                                           int oLen=o.toString().length();
+                                           int pLen=p.toString().length();
+                                           int res=Integer.compare(oLen,pLen);
+                                           if(res==0){
+                                              return o.toString().compareTo(p.toString());
+                                           }
+                                           return Integer.compare(oLen,pLen);
+                                       })
+                                       .forEach(test->{
+                                           System.out.printf("####%s%n",test);
+                                       });
+
+                           });
+
+               });
+
+    }
+}

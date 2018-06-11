@@ -1,0 +1,246 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
+
+public class _1_Shockwave {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        Scanner scanner = new Scanner(System.in);
+
+        int n=scanner.nextInt();
+        int m=scanner.nextInt();
+        scanner.nextLine();
+
+        int[][] plate=new int[n][m];
+
+        String input=scanner.nextLine();
+        while ("Here We Go".equals(input)==false){
+            String[] tokens=input.split(" ");
+            int x1=Integer.parseInt(tokens[0]);
+            int y1=Integer.parseInt(tokens[1]);
+            int x2=Integer.parseInt(tokens[2]);
+            int y2=Integer.parseInt(tokens[3]);
+
+            for (int i = x1; i <=x2 ; i++) {
+                for (int j = y1; j <=y2 ; j++) {
+                    plate[i][j]++;
+                }
+            }
+            input=scanner.nextLine();
+        }
+
+        for (int i = 0; i <n ; i++) {
+            for (int j = 0; j <m ; j++) {
+                System.out.print(plate[i][j]+" ");
+            }
+            System.out.println();
+        }
+    }
+}
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class _2_Earthquake {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        int n=Integer.parseInt(reader.readLine());
+
+        ArrayDeque<ArrayDeque<Integer>> waves=new ArrayDeque<>();
+
+        for (int i = 0; i <n ; i++) {
+            List<Integer> curr= Arrays.stream(reader.readLine().split(" "))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+            ArrayDeque<Integer> curDek=new ArrayDeque<>(curr);
+
+            waves.offer(curDek);
+        }
+
+        ArrayList<Integer> result=new ArrayList<>();
+
+        while (waves.isEmpty()==false){
+
+            ArrayDeque<Integer> curWave=waves.poll();
+
+            if(curWave.size()==1){
+                result.add(curWave.poll());
+            }else {
+                int curBegin=curWave.poll();
+
+                while (curWave.isEmpty()==false&&curBegin>=curWave.peek()){
+
+                    curWave.poll();
+                }
+                result.add(curBegin);
+                if(curWave.isEmpty()==false){
+                    waves.offer(curWave);
+                }
+            }
+        }
+        StringBuilder toPrint=new StringBuilder();
+
+        for (Integer num : result) {
+
+            toPrint.append(num).append(" ");
+        }
+        System.out.println(result.size());
+        System.out.println(toPrint);
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class _3_Ascent {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String regex="(\\,|\\_)([A-Za-z]+)([0-9])";
+        Pattern pat=Pattern.compile(regex);
+
+        LinkedHashMap<String,String> repeted=new LinkedHashMap<>();
+
+        String input=reader.readLine();
+
+        while ("Ascend".equals(input)==false){
+            for (Map.Entry<String, String> kv : repeted.entrySet()) {
+
+                input=input.replaceAll(kv.getKey(),kv.getValue());
+            }
+            StringBuilder curMes=new StringBuilder(input);
+            Matcher mat=pat.matcher(curMes.toString());
+            while (mat.find()){
+                String cql=mat.group(0);
+                String start=mat.group(1);
+                StringBuilder mess=new StringBuilder(mat.group(2));
+                int numFin=Integer.parseInt(mat.group(3));
+
+                String decr=decrypt(start,mess,numFin);
+                repeted.put(cql,decr);
+
+                int indRepl=curMes.indexOf(cql);
+                while (indRepl>=0){
+                    curMes.replace(indRepl,indRepl+cql.length(),decr);
+                    indRepl=curMes.indexOf(cql);
+                }
+
+            }
+            System.out.println(curMes);
+            input=reader.readLine();
+        }
+
+    }
+
+    private static String decrypt(String start, StringBuilder mess, int numFin) {
+        StringBuilder decripted=new StringBuilder();
+        if(start.equals("_")){
+            for (int i = 0; i <mess.length() ; i++) {
+                char curr=(char)(mess.charAt(i)-(char)numFin);
+                decripted.append(curr);
+            }
+        }else {
+            for (int i = 0; i <mess.length() ; i++) {
+                char curr=(char)(mess.charAt(i)+(char)numFin);
+                decripted.append(curr);
+            }
+        }
+        return decripted.toString();
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class _4_Highscore {
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        LinkedHashMap<String, Long> playerScores=new LinkedHashMap<>();
+
+        LinkedHashMap<String, List<String[]>> playersGames=new LinkedHashMap<>();
+
+        String input=reader.readLine();
+
+        while ("osu!".equals(input)==false){
+            String[]tokens=input.split("<->|\\s");
+
+            Long firstScore=Long.parseLong(tokens[0]);
+            String firstname=tokens[1];
+            Long secScore=Long.parseLong(tokens[3]);
+            String secname=tokens[2];
+
+            if(playerScores.containsKey(firstname)==false){
+                playerScores.put(firstname,0L);
+                playersGames.put(firstname,new ArrayList<>());
+            }
+            if(playerScores.containsKey(secname)==false){
+                playerScores.put(secname,0L);
+                playersGames.put(secname,new ArrayList<>());
+            }
+
+            long dif=firstScore-secScore;
+            long curFirst=playerScores.get(firstname);
+            long curSec=playerScores.get(secname);
+
+            if(dif>0){
+
+                playerScores.put(firstname,curFirst+dif);
+                playerScores.put(secname,curSec-dif);
+
+                String[] gameFirst={secname,""+dif};
+                String[] gameSec={firstname,"-"+Math.abs(dif)};
+
+                playersGames.get(firstname).add(gameFirst);
+                playersGames.get(secname).add(gameSec);
+
+            }else if(dif<0){
+                playerScores.put(firstname,curFirst+dif);
+                playerScores.put(secname,curSec-dif);
+
+                String[] gameFirst={secname,"-"+Math.abs(dif)};
+                String[] gameSec={firstname,""+-dif};
+
+                playersGames.get(firstname).add(gameFirst);
+                playersGames.get(secname).add(gameSec);
+            }else {
+                String[] gameFirst={secname,"0"};
+                String[] gameSec={firstname,"0"};
+
+                playersGames.get(firstname).add(gameFirst);
+                playersGames.get(secname).add(gameSec);
+
+            }
+
+            input=reader.readLine();
+        }
+
+        playerScores.entrySet().stream()
+                .sorted((x,y)->{
+                    return Long.compare(y.getValue(),x.getValue());
+                })
+                .forEach(kv->{
+                    System.out.printf("%s - (%d)%n",kv.getKey(),kv.getValue());
+
+                    playersGames.get(kv.getKey()).stream()
+                            .forEach(s->{
+                                System.out.printf("*   %s <-> %s%n",s[0],s[1]);
+                            });
+                });
+
+    }
+}

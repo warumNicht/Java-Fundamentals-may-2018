@@ -1,0 +1,339 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+public class _1_Internships {
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String regex="^[A-Z][a-z]+\\s[A-Z][a-z]+$";
+        Pattern pat=Pattern.compile(regex);
+
+        int n=Integer.parseInt(reader.readLine());
+        int m=Integer.parseInt(reader.readLine());
+
+        ArrayDeque<String> problems=new ArrayDeque<>();
+        ArrayDeque<String> candidates=new ArrayDeque<>();
+
+        for(int i=0; i<n; i++){
+            String curProblem=reader.readLine();
+            problems.push(curProblem);
+        }
+
+        for (int j = 0; j <m ; j++) {
+            String curCandidat=reader.readLine();
+
+            Matcher mat=pat.matcher(curCandidat);
+
+            if(mat.find()){
+                candidates.offer(curCandidat);
+            }
+        }
+
+        while (problems.isEmpty()==false&&candidates.size()>1){
+
+            String curPb=problems.pop();
+            String curCand=candidates.poll();
+
+            if(isSovled(curPb, curCand)){
+                System.out.println(curCand+" solved "+curPb+".");
+                candidates.offer(curCand);
+            }else{
+                System.out.println(curCand+" failed "+ curPb+".");
+                problems.addLast(curPb);
+            }
+        }
+
+        if(candidates.size()==1){
+            System.out.println(candidates.poll()+" gets the job!");
+        }else{
+            System.out.println(String.join(", ",candidates));
+        }
+    }
+
+    private static boolean isSovled(String curPb, String curCand) {
+
+        int sumProblem=0;
+        for(int i=0; i<curPb.length(); i++){
+            sumProblem+=curPb.charAt(i);
+        }
+        int sumCan=0;
+        for(int i=0; i<curCand.length(); i++){
+            sumCan+=curCand.charAt(i);
+        }
+        if(sumCan>sumProblem){
+            return true;
+        }else {
+            return false;
+        }
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class _2_Snake {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        int snakeLen=1;
+        int n=Integer.parseInt(reader.readLine());
+        String[] com=reader.readLine().split(", ");
+        int foodCount=0;
+
+        int startRow=0;
+        int startCol=0;
+
+        char[][] matrix=new char[n][n];
+
+        for(int i=0; i<n; i++){
+            String[] tokens=reader.readLine().split(" ");
+            for (int j = 0; j <n ; j++) {
+                char curChar=tokens[j].charAt(0);
+                if(curChar=='s'){
+                    startRow=i;
+                    startCol=j;
+                }else if(curChar=='f'){
+                    foodCount++;
+                }
+                matrix[i][j]=curChar;
+            }
+        }
+        boolean isKilled=false;
+        boolean win=false;
+
+        for (String order : com) {
+
+            switch (order){
+                case "left":{
+                    int nextCol=startCol-1;
+                    if(nextCol<0){
+                        startCol=n-1;
+                    }else {
+                        startCol=nextCol;
+                    }
+
+                }break;
+                case "right":{
+                    int precedCol=startCol+1;
+                    if(precedCol>n-1){
+                        startCol=0;
+                    }else {
+                        startCol=precedCol;
+                    }
+                }break;
+                case "up":{
+
+                    int nextRow=startRow-1;
+                    if(nextRow<0){
+                        startRow=n-1;
+                    }else {
+                        startRow=nextRow;
+                    }
+
+                }break;
+                case "down":{
+                    int nextRow=startRow+1;
+                    if(nextRow>n-1){
+                        startRow=0;
+                    }else {
+                        startRow=nextRow;
+                    }
+
+                }break;
+            }
+            if(matrix[startRow][startCol]=='f'){
+                foodCount--;
+                snakeLen++;
+
+                if(foodCount==0){
+                    win=true;
+                    break;
+                }
+
+            }else if(matrix[startRow][startCol]=='e'){
+                isKilled=true;
+            }
+            if(isKilled||win){
+                break;
+            }
+        }
+
+        if(isKilled){
+            System.out.println("You lose! Killed by an enemy!");
+        }else if(win){
+            System.out.printf("You win! Final snake length is %d",snakeLen);
+        }else {
+            System.out.printf("You lose! There is still %d food to be eaten.",foodCount);
+        }
+
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class _3_Genome {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        String regex="([a-z!@#$?]+)=(\\d+)--(\\d+)<<([a-z]+)";
+        Pattern pat=Pattern.compile(regex);
+
+        String input=reader.readLine();
+
+        LinkedHashMap<String,Integer> animals=new LinkedHashMap<>();
+
+        while ("Stop!".equals(input)==false){
+
+            Matcher mat=pat.matcher(input);
+
+            if(mat.find()){
+                String name=mat.group(1);
+                int lentName=Integer.parseInt(mat.group(2));
+                int countGen=Integer.parseInt(mat.group(3));
+                String animal=mat.group(4);
+
+                name=name.replaceAll("[!@#$?]","");
+                if(name.length()==lentName){
+
+                    if(animals.containsKey(animal)==false){
+                        animals.put(animal,countGen);
+                    }else {
+                        int existingGen=animals.get(animal);
+                        animals.put(animal,existingGen+countGen);
+                    }
+                }
+
+            }
+            input=reader.readLine();
+        }
+
+        StringBuilder res=new StringBuilder();
+
+        animals.entrySet().stream()
+                .sorted((x,y)->{
+                    return Integer.compare(y.getValue(),x.getValue());
+                })
+                .forEach(kv->{
+                    res.append(String.format("%s has genome size of %d%n",kv.getKey(),kv.getValue()));
+
+                });
+
+        System.out.println(res);
+
+    }
+}
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+public class _4_Ranking {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        LinkedHashMap<String,String> contParoles=new LinkedHashMap<>();
+
+        String input=reader.readLine();
+        String regex1="^([^:=>]+):([^:=>]+)$";
+        Pattern pat1=Pattern.compile(regex1);
+
+        while ("end of contests".equals(input)==false){
+            String[] tockens=input.split(":");
+            Matcher mat1=pat1.matcher(input);
+
+            if(mat1.find()){
+                String contest=mat1.group(1);
+                String password=mat1.group(2);
+
+                contParoles.put(contest,password);
+            }
+            input=reader.readLine();
+        }
+
+        input=reader.readLine();
+
+        LinkedHashMap<String,LinkedHashMap<String,Integer>> users=new LinkedHashMap<>();
+
+        while ("end of submissions".equals(input)==false){
+
+            String[] tokens=input.split("=>");
+            String curCont=tokens[0];
+            String curPassword=tokens[1];
+
+            if(contParoles.containsKey(curCont)&&contParoles.get(curCont).equals(curPassword)){
+
+                String curUser=tokens[2];
+                int curPoints=Integer.parseInt(tokens[3]);
+
+                if(users.containsKey(curUser)==false){
+                    users.put(curUser,new LinkedHashMap<>());
+                }
+                if(users.get(curUser).containsKey(curCont)==false){
+                    users.get(curUser).put(curCont,curPoints);
+                }else {
+                    int curUserPoints=users.get(curUser).get(curCont);
+                    if(curUserPoints<curPoints){
+                        users.get(curUser).put(curCont,curPoints);
+                    }
+                }
+            }
+            input=reader.readLine();
+        }
+
+        List<Map.Entry> thebest= users.entrySet().stream()
+                .sorted((x,y)->{
+                    int xPoints=x.getValue().values().stream()
+                            .mapToInt(Integer::intValue)
+                            .sum();
+                    int yPoints=y.getValue().values().stream()
+                            .mapToInt(Integer::intValue)
+                            .sum();
+                    return Integer.compare(yPoints,xPoints);
+                })
+                .limit(1)
+                .collect(Collectors.toList());
+
+        for (Map.Entry entry : thebest) {
+            int bestPoints=    users.get(entry.getKey()).values().stream()
+                    .mapToInt(Integer::intValue)
+                    .sum();
+            System.out.printf("Best candidate is %s with total %d points.%n",entry.getKey(),bestPoints);
+        }
+
+        System.out.println("Ranking:");
+
+        users.entrySet().stream()
+                .sorted((x,y)->{
+                    return x.getKey().compareTo(y.getKey());
+                })
+                .forEach(kv->{
+                    System.out.println(kv.getKey());
+                    users.get(kv.getKey()).entrySet().stream()
+                            .sorted((a,b)->{
+                                return Integer.compare(b.getValue(),a.getValue());
+                            })
+                            .forEach(st->{
+                                System.out.printf("#  %s -> %d%n",st.getKey(),st.getValue());
+
+                            });
+                });
+
+    }
+}
+
+
